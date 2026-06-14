@@ -1,6 +1,6 @@
 # AI-Powered Crop Disease Detection and Farmer Advisory System
 
-## TBI-GEU Summer Internship Program 2026
+
 
 ### Project Overview
 

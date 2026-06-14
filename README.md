@@ -33,8 +33,8 @@ Farmers can upload images of affected crops, and the system will analyze them to
 
 #### AI/ML
 - TensorFlow
-- PlantVillage Dataset
-- Gemini API
+- PlantVillage Database
+
 
 ### Internship Track
 AI-Assisted Full Stack Web Development

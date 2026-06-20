@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 export default function Hero() {
   return (
-    <section className="bg-gradient-to-r from-green-500 to-green-700 text-white py-20 px-4">
+    <section className="bg-gradient-to-r from-green-500 to-green-700 dark:from-green-700 dark:to-green-900 text-white py-20 px-4 transition-colors duration-200">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-8 items-center">
           {/* Text Content */}

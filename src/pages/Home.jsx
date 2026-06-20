@@ -28,11 +28,11 @@ export default function Home() {
       <Hero />
 
       {/* Features Section */}
-      <section className="py-16 px-4 bg-gray-50">
+      <section className="py-16 px-4 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Our Features</h2>
-            <p className="text-xl text-gray-600">Everything you need to protect your crops and maximize yield</p>
+            <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">Our Features</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">Everything you need to protect your crops and maximize yield</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">

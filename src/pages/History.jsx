@@ -55,6 +55,34 @@ export default function History() {
     }
   }
 
+  // Edit Diagnosis State
+  const [editingDiagnosis, setEditingDiagnosis] = useState(null)
+  const [editFormData, setEditFormData] = useState({ status: 'Detected' })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleEditClick = (diagnosis) => {
+    setEditingDiagnosis(diagnosis)
+    setEditFormData({ status: diagnosis.status })
+  }
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    try {
+      const response = await diagnosisApi.update(editingDiagnosis.id, editFormData)
+      // Update local state
+      setDiagnoses((prev) =>
+        prev.map((d) => (d.id === editingDiagnosis.id ? response.data : d))
+      )
+      addToast(`Diagnosis for "${response.data.cropName}" updated`, 'success')
+      setEditingDiagnosis(null)
+    } catch (error) {
+      addToast(error.message || 'Failed to update diagnosis', 'error')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   // Delete a diagnosis
   const handleDelete = async (id, cropName) => {
     if (!window.confirm(`Delete diagnosis for "${cropName}"?`)) return
@@ -193,7 +221,17 @@ export default function History() {
                             {diagnosis.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-4 py-3 text-center flex justify-center gap-2">
+                          <button
+                            onClick={() => handleEditClick(diagnosis)}
+                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 
+                              transition-colors duration-200 p-1"
+                            title="Edit diagnosis status"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
                           <button
                             onClick={() => handleDelete(diagnosis.id, diagnosis.cropName)}
                             className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 
@@ -219,6 +257,80 @@ export default function History() {
       </main>
 
       <Footer />
+
+      {/* Edit Modal */}
+      {editingDiagnosis && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in-up">
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-white">Update Status</h3>
+              <button
+                onClick={() => setEditingDiagnosis(null)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleEditSubmit} className="p-6">
+              <div className="mb-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Crop</p>
+                <p className="font-semibold text-gray-800 dark:text-white">{editingDiagnosis.cropName}</p>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Disease</p>
+                <p className="font-semibold text-gray-800 dark:text-white">{editingDiagnosis.diseaseName}</p>
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Treatment Status
+                </label>
+                <select
+                  value={editFormData.status}
+                  onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
+                    bg-white dark:bg-gray-700 text-gray-800 dark:text-white
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
+                    transition-colors duration-200"
+                >
+                  <option value="Detected">Detected</option>
+                  <option value="Under Treatment">Under Treatment</option>
+                  <option value="Treated">Treated</option>
+                </select>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setEditingDiagnosis(null)}
+                  className="px-5 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 
+                    dark:hover:bg-gray-700 font-medium rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-medium 
+                    rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader size="sm" variant="spinner" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Toast Notifications */}
       <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">

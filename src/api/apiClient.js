@@ -3,10 +3,11 @@
  * Uses fetch with consistent error handling and base URL configuration.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /**
  * Generic fetch wrapper with error handling.
+ * Automatically attaches JWT token from localStorage if present.
  * @param {string} endpoint - API endpoint (e.g., '/diagnoses')
  * @param {object} options - Fetch options (method, body, headers)
  * @returns {Promise<object>} Parsed JSON response
@@ -14,9 +15,13 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
 
+  // Retrieve stored JWT token
+  const token = localStorage.getItem('cropcare_token');
+
   const config = {
     headers: {
       'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     },
     ...options,
@@ -43,6 +48,29 @@ async function apiRequest(endpoint, options = {}) {
 
   return data;
 }
+
+// ──────────────────────────────────────────────
+// Auth API
+// ──────────────────────────────────────────────
+
+export const authApi = {
+  /** Register a new user */
+  register: (name, email, password) =>
+    apiRequest('/auth/register', {
+      method: 'POST',
+      body: { name, email, password },
+    }),
+
+  /** Login with email and password */
+  login: (email, password) =>
+    apiRequest('/auth/login', {
+      method: 'POST',
+      body: { email, password },
+    }),
+
+  /** Get current authenticated user */
+  getMe: () => apiRequest('/auth/me'),
+};
 
 // ──────────────────────────────────────────────
 // Diagnosis API

@@ -6,7 +6,7 @@ const User = require('../models/User');
  */
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE || '30d',
+    expiresIn: process.env.JWT_EXPIRE || '7d',
   });
 };
 
@@ -147,6 +147,7 @@ const getMe = async (req, res) => {
           name: user.name,
           email: user.email,
           role: user.role,
+          avatar: user.avatar || '',
         },
       },
     });
@@ -158,4 +159,24 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe };
+/**
+ * @desc    GitHub OAuth callback — generates JWT and redirects to frontend
+ * @route   GET /api/auth/github/callback
+ * @access  Public (called by GitHub after OAuth)
+ */
+const githubCallback = (req, res) => {
+  try {
+    // Passport attaches the authenticated user to req.user
+    const token = generateToken(req.user._id);
+
+    // Redirect to the frontend OAuth callback page with the token
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/auth/callback?token=${token}`);
+  } catch (error) {
+    console.error('[AUTH ERROR] GitHub callback:', error);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/login?error=oauth_failed`);
+  }
+};
+
+module.exports = { register, login, getMe, githubCallback };

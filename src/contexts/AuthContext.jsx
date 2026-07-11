@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { authApi } from '../api/apiClient'
 
 const AuthContext = createContext(null)
@@ -47,6 +47,18 @@ export function AuthProvider({ children }) {
     return userData
   }
 
+  /**
+   * Login with a pre-existing JWT token (used by OAuth callback).
+   * Stores the token and fetches the user profile.
+   */
+  const loginWithToken = useCallback(async (newToken) => {
+    localStorage.setItem('cropcare_token', newToken)
+    setToken(newToken)
+    const data = await authApi.getMe()
+    setUser(data.data.user)
+    return data.data.user
+  }, [])
+
   const logout = () => {
     localStorage.removeItem('cropcare_token')
     setToken(null)
@@ -54,7 +66,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, loginWithToken, logout }}>
       {children}
     </AuthContext.Provider>
   )

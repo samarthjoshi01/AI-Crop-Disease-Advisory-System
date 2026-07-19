@@ -1,14 +1,15 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+// Load environment variables BEFORE importing passport (it reads GITHUB_CLIENT_ID/SECRET)
+dotenv.config();
+
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const passport = require('./config/passport');
 const { errorHandler } = require('./middleware/errorHandler');
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -82,6 +83,18 @@ const authLimiter = rateLimit({
   },
 });
 
+// AI rate limiter — 10 requests per 15 minutes (protects Gemini API quota)
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: { message: 'Too many AI requests. Please wait a few minutes before trying again.' },
+  },
+});
+
 // ──────────────────────────────────────────────
 // Routes
 // ──────────────────────────────────────────────
@@ -100,16 +113,21 @@ const authRoutes = require('./routes/authRoutes');
 const diagnosisRoutes = require('./routes/diagnosisRoutes');
 const advisoryRoutes = require('./routes/advisoryRoutes');
 const cropRoutes = require('./routes/cropRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 // Apply auth rate limiter to login and register
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+
+// Apply AI rate limiter to AI endpoints
+app.use('/api/ai', aiLimiter);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/diagnoses', diagnosisRoutes);
 app.use('/api/diseases', diagnosisRoutes);   // alias for /api/diagnoses
 app.use('/api/advisories', advisoryRoutes);
 app.use('/api/crops', cropRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 404 handler for unknown routes
 app.use((req, res) => {

@@ -122,3 +122,23 @@ export const advisoryApi = {
       body: { question },
     }),
 };
+
+// ──────────────────────────────────────────────
+// AI API (Gemini-powered)
+// ──────────────────────────────────────────────
+
+export const aiApi = {
+  /** Get AI-powered farming advisory response */
+  advisory: (question) =>
+    apiRequest('/ai/advisory', {
+      method: 'POST',
+      body: { question },
+    }),
+
+  /** Get AI-powered crop disease analysis */
+  diagnose: (cropName, diseaseName, symptoms = '') =>
+    apiRequest('/ai/diagnose', {
+      method: 'POST',
+      body: { cropName, diseaseName, symptoms },
+    }),
+};

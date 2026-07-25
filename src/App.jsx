@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider } from './contexts/AuthContext'
+import ErrorBoundary from './components/ErrorBoundary'
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import DiseaseDetection from './pages/DiseaseDetection'
@@ -17,25 +18,27 @@ function App() {
       <AuthProvider>
         <Router>
           <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/auth/callback" element={<OAuthCallback />} />
+            <ErrorBoundary>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/auth/callback" element={<OAuthCallback />} />
 
-              {/* Protected routes */}
-              <Route path="/disease-detection" element={
-                <ProtectedRoute><DiseaseDetection /></ProtectedRoute>
-              } />
-              <Route path="/advisory" element={
-                <ProtectedRoute><Advisory /></ProtectedRoute>
-              } />
-              <Route path="/history" element={
-                <ProtectedRoute><History /></ProtectedRoute>
-              } />
-            </Routes>
+                {/* Protected routes */}
+                <Route path="/disease-detection" element={
+                  <ProtectedRoute><DiseaseDetection /></ProtectedRoute>
+                } />
+                <Route path="/advisory" element={
+                  <ProtectedRoute><Advisory /></ProtectedRoute>
+                } />
+                <Route path="/history" element={
+                  <ProtectedRoute><History /></ProtectedRoute>
+                } />
+              </Routes>
+            </ErrorBoundary>
           </div>
         </Router>
       </AuthProvider>

@@ -8,7 +8,7 @@ const { ApiError } = require('../middleware/errorHandler');
  */
 const getAllDiagnoses = async (req, res, next) => {
   try {
-    const diagnoses = await Diagnosis.find()
+    const diagnoses = await Diagnosis.find({ user: req.user.id })
       .populate('crop', 'name season region')
       .sort({ createdAt: -1 });
 
@@ -31,7 +31,7 @@ const searchDiagnoses = async (req, res, next) => {
     const { q } = req.query;
 
     if (!q || q.trim() === '') {
-      const diagnoses = await Diagnosis.find()
+      const diagnoses = await Diagnosis.find({ user: req.user.id })
         .populate('crop', 'name season region')
         .sort({ createdAt: -1 });
 
@@ -45,6 +45,7 @@ const searchDiagnoses = async (req, res, next) => {
     const regex = new RegExp(q.trim(), 'i');
 
     const diagnoses = await Diagnosis.find({
+      user: req.user.id,
       $or: [
         { cropName: regex },
         { diseaseName: regex },
@@ -70,7 +71,7 @@ const searchDiagnoses = async (req, res, next) => {
  */
 const getDiagnosisById = async (req, res, next) => {
   try {
-    const diagnosis = await Diagnosis.findById(req.params.id)
+    const diagnosis = await Diagnosis.findOne({ _id: req.params.id, user: req.user.id })
       .populate('crop', 'name season region');
 
     if (!diagnosis) {
@@ -110,6 +111,7 @@ const createDiagnosis = async (req, res, next) => {
     const crop = await Crop.findOne({ name: new RegExp(`^${cropName.trim()}$`, 'i') });
 
     const diagnosis = await Diagnosis.create({
+      user: req.user.id,
       crop: crop ? crop._id : null,
       cropName: cropName.trim(),
       diseaseName: diseaseName.trim(),
@@ -153,10 +155,14 @@ const updateDiagnosis = async (req, res, next) => {
       }
     }
 
-    const diagnosis = await Diagnosis.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    }).populate('crop', 'name season region');
+    const diagnosis = await Diagnosis.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate('crop', 'name season region');
 
     if (!diagnosis) {
       return next(new ApiError(`Diagnosis with ID '${req.params.id}' not found`, 404));
@@ -180,7 +186,7 @@ const updateDiagnosis = async (req, res, next) => {
  */
 const deleteDiagnosis = async (req, res, next) => {
   try {
-    const diagnosis = await Diagnosis.findByIdAndDelete(req.params.id);
+    const diagnosis = await Diagnosis.findOneAndDelete({ _id: req.params.id, user: req.user.id });
 
     if (!diagnosis) {
       return next(new ApiError(`Diagnosis with ID '${req.params.id}' not found`, 404));

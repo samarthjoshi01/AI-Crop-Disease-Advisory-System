@@ -1,5 +1,7 @@
-const { getAdvisoryResponse, getDiagnosisAnalysis, GeminiServiceError } = require('../services/geminiService');
+const { getAdvisoryResponse, getDiagnosisAnalysis, detectDiseaseFromImage, GeminiServiceError } = require('../services/geminiService');
 const Advisory = require('../models/Advisory');
+const Diagnosis = require('../models/Diagnosis');
+const Crop = require('../models/Crop');
 const { ApiError } = require('../middleware/errorHandler');
 
 /**
@@ -27,6 +29,7 @@ const aiAdvisory = async (req, res, next) => {
 
     // Save to database (preserves chat history)
     const advisory = await Advisory.create({
+      user: req.user.id,
       question: trimmedQuestion,
       answer,
       category,
@@ -108,7 +111,86 @@ const aiDiagnose = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc    AI-powered disease detection from crop image
+ * @route   POST /api/ai/detect-image
+ * @access  Protected (JWT)
+ */
+const aiDetectFromImage = async (req, res, next) => {
+  try {
+    const { image, mimeType, cropName } = req.body;
+
+    if (!image) {
+      return next(new ApiError('image (base64) is required', 400));
+    }
+
+    if (!mimeType) {
+      return next(new ApiError('mimeType is required (e.g., image/jpeg)', 400));
+    }
+
+    // Validate mime type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(mimeType)) {
+      return next(new ApiError(`Unsupported image type: ${mimeType}. Use JPEG, PNG, WebP, or GIF.`, 400));
+    }
+
+    // Call Gemini Vision AI
+    const detection = await detectDiseaseFromImage(
+      image,
+      mimeType,
+      cropName?.trim() || ''
+    );
+
+    // Auto-save diagnosis to database
+    const crop = await Crop.findOne({
+      name: new RegExp(`^${detection.cropName}$`, 'i'),
+    });
+
+    const diagnosis = await Diagnosis.create({
+      user: req.user.id,
+      crop: crop ? crop._id : null,
+      cropName: detection.cropName,
+      diseaseName: detection.diseaseName,
+      confidence: detection.confidence,
+      status: detection.isHealthy ? 'Treated' : 'Detected',
+      treatment: detection.treatment,
+      preventiveMeasures: detection.preventiveMeasures,
+      diagnosisDate: new Date(),
+    });
+
+    await diagnosis.populate('crop', 'name season region');
+
+    res.status(201).json({
+      success: true,
+      data: {
+        detection,
+        diagnosis,
+      },
+      meta: {
+        aiPowered: true,
+        model: 'gemini-1.5-flash',
+        visionAnalysis: true,
+      },
+    });
+  } catch (error) {
+    console.error('[AI DETECT-IMAGE ERROR]', error.message || error);
+    if (error instanceof GeminiServiceError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+        },
+        meta: { aiPowered: true },
+      });
+    }
+    next(error);
+  }
+};
+
 module.exports = {
   aiAdvisory,
   aiDiagnose,
+  aiDetectFromImage,
 };
+

@@ -141,4 +141,11 @@ export const aiApi = {
       method: 'POST',
       body: { cropName, diseaseName, symptoms },
     }),
+
+  /** Detect crop disease from an uploaded image */
+  detectFromImage: (base64Image, mimeType, cropName = '') =>
+    apiRequest('/ai/detect-image', {
+      method: 'POST',
+      body: { image: base64Image, mimeType, cropName },
+    }),
 };

@@ -26,8 +26,8 @@ app.use(cors({
   credentials: true,
 }));
 
-// Parse JSON request bodies
-app.use(express.json());
+// Parse JSON request bodies (increased limit for base64 image uploads)
+app.use(express.json({ limit: '10mb' }));
 
 // Session (required for Passport OAuth flow)
 app.use(
@@ -71,10 +71,10 @@ const globalLimiter = rateLimit({
 });
 app.use('/api', globalLimiter);
 
-// Strict auth rate limiter — 5 requests per 15 minutes
+// Auth rate limiter — 20 requests per 15 minutes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -83,15 +83,15 @@ const authLimiter = rateLimit({
   },
 });
 
-// AI rate limiter — 10 requests per 15 minutes (protects Gemini API quota)
+// AI rate limiter — 50 requests per 15 minutes (protects Gemini API quota)
 const aiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 50,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    error: { message: 'Too many AI requests. Please wait a few minutes before trying again.' },
+    error: { message: 'AI rate limit reached. Please wait a few minutes before trying again.' },
   },
 });
 

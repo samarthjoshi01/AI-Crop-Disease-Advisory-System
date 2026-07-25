@@ -8,8 +8,8 @@ const {
   deleteAdvisory,
 } = require('../controllers/advisoryController');
 
-// Public — read access
-router.get('/', getAllAdvisories);
+// Protected routes (requires JWT)
+router.get('/', protect, getAllAdvisories);
 
 // Protected — write access (requires JWT)
 router.post('/', protect, createAdvisory);

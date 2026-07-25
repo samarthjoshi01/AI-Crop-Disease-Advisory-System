@@ -7,7 +7,7 @@ const { ApiError } = require('../middleware/errorHandler');
  */
 const getAllAdvisories = async (req, res, next) => {
   try {
-    const advisories = await Advisory.find().sort({ createdAt: -1 });
+    const advisories = await Advisory.find({ user: req.user.id }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -106,6 +106,7 @@ const createAdvisory = async (req, res, next) => {
     }
 
     const advisory = await Advisory.create({
+      user: req.user.id,
       question: question.trim(),
       answer,
       category,
@@ -126,10 +127,14 @@ const createAdvisory = async (req, res, next) => {
  */
 const updateAdvisory = async (req, res, next) => {
   try {
-    const advisory = await Advisory.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const advisory = await Advisory.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.id },
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (!advisory) {
       return next(new ApiError(`Advisory with ID '${req.params.id}' not found`, 404));
@@ -153,7 +158,7 @@ const updateAdvisory = async (req, res, next) => {
  */
 const deleteAdvisory = async (req, res, next) => {
   try {
-    const advisory = await Advisory.findByIdAndDelete(req.params.id);
+    const advisory = await Advisory.findOneAndDelete({ _id: req.params.id, user: req.user.id });
 
     if (!advisory) {
       return next(new ApiError(`Advisory with ID '${req.params.id}' not found`, 404));

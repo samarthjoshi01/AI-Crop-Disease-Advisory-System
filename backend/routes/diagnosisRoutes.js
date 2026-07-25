@@ -10,12 +10,10 @@ const {
   deleteDiagnosis
 } = require('../controllers/diagnosisController');
 
-// Search must come BEFORE :id to prevent "search" from matching as an ID
-router.get('/search', searchDiagnoses);
-
-// Public — read access
-router.get('/', getAllDiagnoses);
-router.get('/:id', getDiagnosisById);
+// Protected routes (requires JWT)
+router.get('/search', protect, searchDiagnoses);
+router.get('/', protect, getAllDiagnoses);
+router.get('/:id', protect, getDiagnosisById);
 
 // Protected — write access (requires JWT)
 router.post('/', protect, createDiagnosis);

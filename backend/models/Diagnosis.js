@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 const diagnosisSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     crop: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Crop',

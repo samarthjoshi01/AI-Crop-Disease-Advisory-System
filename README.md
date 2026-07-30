@@ -2,6 +2,81 @@
 
 A full-stack AI-powered web platform that helps farmers identify crop diseases and receive agricultural guidance.
 
+## 🚀 Live Deployment
+
+| Layer | URL |
+|-------|-----|
+| **Frontend** | [https://cropcare-ai.vercel.app](https://cropcare-ai.vercel.app) *(update with your actual Vercel URL)* |
+| **Backend API** | [https://cropcare-ai-api.onrender.com](https://cropcare-ai-api.onrender.com) *(update with your actual Render URL)* |
+| **Database** | MongoDB Atlas (M0 free tier) |
+
+### Tech Stack Summary
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | React 18 + Vite + Tailwind CSS |
+| Backend | Node.js + Express.js |
+| Database | MongoDB Atlas + Mongoose ODM |
+| AI | Google Gemini API |
+| Auth | JWT + GitHub OAuth (Passport.js) |
+| Frontend Hosting | Vercel |
+| Backend Hosting | Render |
+
+### Known Limitations (Free Tier)
+
+- **Render free tier spin-down**: The backend service spins down after 15 minutes of inactivity. The first request after idle takes **30–60 seconds** to wake up. Subsequent requests are fast.
+- **MongoDB Atlas M0**: Limited to 512 MB storage and shared RAM. Sufficient for development and demo purposes.
+- **Rate Limiting**: API requests are rate-limited (100 requests per 15 minutes globally, 20 for auth, 50 for AI endpoints).
+
+---
+
+## Deployment Guide
+
+### Step 1: Deploy Backend to Render
+
+1. Go to [render.com](https://render.com) → **New** → **Web Service** → Connect your GitHub repo.
+2. Set **Root Directory** to `backend/`.
+3. Set **Build Command** to `npm install`.
+4. Set **Start Command** to `npm start`.
+5. Add the following **Environment Variables** in the Render dashboard:
+
+| Variable | Value |
+|----------|-------|
+| `NODE_ENV` | `production` |
+| `FRONTEND_URL` | `https://your-vercel-url.vercel.app` *(update after Vercel deploy)* |
+| `MONGO_URI` | Your MongoDB Atlas connection string |
+| `JWT_SECRET` | Your JWT secret key |
+| `JWT_EXPIRE` | `7d` |
+| `GITHUB_CLIENT_ID` | Your GitHub OAuth App client ID |
+| `GITHUB_CLIENT_SECRET` | Your GitHub OAuth App client secret |
+| `GITHUB_CALLBACK_URL` | `https://your-render-url.onrender.com/api/auth/github/callback` |
+| `SESSION_SECRET` | Your session secret key |
+| `GEMINI_API_KEY` | Your Google Gemini API key |
+
+6. Click **Deploy**. Note your Render URL (e.g., `https://cropcare-ai-api.onrender.com`).
+
+### Step 2: Deploy Frontend to Vercel
+
+1. Go to [vercel.com](https://vercel.com) → **New Project** → Import your GitHub repo.
+2. Framework Preset will auto-detect **Vite**.
+3. Root directory stays as `/` (default).
+4. Add **Environment Variable** in the Vercel dashboard:
+
+| Variable | Value |
+|----------|-------|
+| `VITE_API_URL` | `https://your-render-url.onrender.com/api` |
+
+5. Click **Deploy**. Note your Vercel URL (e.g., `https://cropcare-ai.vercel.app`).
+
+### Step 3: Update Cross-References
+
+1. **Render dashboard**: Update `FRONTEND_URL` to your actual Vercel URL → Redeploy.
+2. **Render dashboard**: Update `GITHUB_CALLBACK_URL` to use your actual Render URL.
+3. **GitHub OAuth App** (github.com/settings/developers): Update the **Authorization callback URL** to `https://your-render-url.onrender.com/api/auth/github/callback`.
+4. **MongoDB Atlas**: Verify **Network Access** includes `0.0.0.0/0` (allow from anywhere) for Render's dynamic IPs.
+
+---
+
 ## Project Overview
 
 CropCare AI combines a React frontend with an Express.js backend API to provide crop disease detection, farmer advisory chatbot, and diagnosis history tracking. All data is persisted in a MongoDB Atlas cloud database.

@@ -5,7 +5,7 @@ import Card from '../components/Card'
 import Footer from '../components/Footer'
 import { Loader } from '../components/ui'
 
-const API_BASE = 'http://localhost:5000/api'
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 export default function Home() {
   const [stats, setStats] = useState(null)

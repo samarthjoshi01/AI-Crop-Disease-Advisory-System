@@ -6,8 +6,8 @@ A full-stack AI-powered web platform that helps farmers identify crop diseases a
 
 | Layer | URL |
 |-------|-----|
-| **Frontend** | [https://cropcare-ai.vercel.app](https://cropcare-ai.vercel.app) *(update with your actual Vercel URL)* |
-| **Backend API** | [https://cropcare-ai-api.onrender.com](https://cropcare-ai-api.onrender.com) *(update with your actual Render URL)* |
+| **Frontend** | [https://ai-crop-disease-advisory-system.vercel.app](https://ai-crop-disease-advisory-system.vercel.app) |
+| **Backend API** | [https://ai-crop-disease-advisory-system.onrender.com](https://ai-crop-disease-advisory-system.onrender.com) |
 | **Database** | MongoDB Atlas (M0 free tier) |
 
 ### Tech Stack Summary
@@ -43,17 +43,17 @@ A full-stack AI-powered web platform that helps farmers identify crop diseases a
 | Variable | Value |
 |----------|-------|
 | `NODE_ENV` | `production` |
-| `FRONTEND_URL` | `https://your-vercel-url.vercel.app` *(update after Vercel deploy)* |
+| `FRONTEND_URL` | `https://ai-crop-disease-advisory-system.vercel.app` |
 | `MONGO_URI` | Your MongoDB Atlas connection string |
 | `JWT_SECRET` | Your JWT secret key |
 | `JWT_EXPIRE` | `7d` |
 | `GITHUB_CLIENT_ID` | Your GitHub OAuth App client ID |
 | `GITHUB_CLIENT_SECRET` | Your GitHub OAuth App client secret |
-| `GITHUB_CALLBACK_URL` | `https://your-render-url.onrender.com/api/auth/github/callback` |
+| `GITHUB_CALLBACK_URL` | `https://ai-crop-disease-advisory-system.onrender.com/api/auth/github/callback` |
 | `SESSION_SECRET` | Your session secret key |
 | `GEMINI_API_KEY` | Your Google Gemini API key |
 
-6. Click **Deploy**. Note your Render URL (e.g., `https://cropcare-ai-api.onrender.com`).
+6. Click **Deploy**. Note your Render URL (e.g., `https://ai-crop-disease-advisory-system.onrender.com`).
 
 ### Step 2: Deploy Frontend to Vercel
 
@@ -64,15 +64,15 @@ A full-stack AI-powered web platform that helps farmers identify crop diseases a
 
 | Variable | Value |
 |----------|-------|
-| `VITE_API_URL` | `https://your-render-url.onrender.com/api` |
+| `VITE_API_URL` | `https://ai-crop-disease-advisory-system.onrender.com/api` |
 
-5. Click **Deploy**. Note your Vercel URL (e.g., `https://cropcare-ai.vercel.app`).
+5. Click **Deploy**. Note your Vercel URL (e.g., `https://ai-crop-disease-advisory-system.vercel.app`).
 
 ### Step 3: Update Cross-References
 
 1. **Render dashboard**: Update `FRONTEND_URL` to your actual Vercel URL → Redeploy.
 2. **Render dashboard**: Update `GITHUB_CALLBACK_URL` to use your actual Render URL.
-3. **GitHub OAuth App** (github.com/settings/developers): Update the **Authorization callback URL** to `https://your-render-url.onrender.com/api/auth/github/callback`.
+3. **GitHub OAuth App** (github.com/settings/developers): Update the **Authorization callback URL** to `https://ai-crop-disease-advisory-system.onrender.com/api/auth/github/callback`.
 4. **MongoDB Atlas**: Verify **Network Access** includes `0.0.0.0/0` (allow from anywhere) for Render's dynamic IPs.
 
 ---

@@ -43,9 +43,9 @@ export default function About() {
                     <h3 className="font-bold text-green-600 dark:text-green-400 mb-2">Backend & AI</h3>
                     <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-1">
                       <li>Node.js & Express.js</li>
-                      <li>TensorFlow CNN</li>
-                      <li>Gemini API</li>
-                      <li>MongoDB</li>
+                      <li>Google Gemini Vision AI</li>
+                      <li>Google Generative AI SDK</li>
+                      <li>MongoDB & Mongoose ODM</li>
                     </ul>
                   </div>
                 </div>

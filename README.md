@@ -12,12 +12,6 @@
 
 ---
 
-## 🎥 Demo Video
-
-- **Video Walkthrough (YouTube Unlisted):** [https://youtu.be/DEMO_VIDEO_UNLISTED_LINK](https://youtu.be/DEMO_VIDEO_UNLISTED_LINK)  
-  *(Duration: ~5 minutes — covers project introduction, core user flows, live Gemini Vision AI disease detection, advisory chat, and architecture tour)*
-
----
 
 ## 📸 Screenshots
 
